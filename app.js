@@ -4,15 +4,27 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var app = express();
+    
 //3rd party libs
 var passport = require('passport');
 var session = require('express-session');
+var mongoose = require('mongoose');
+
+//connect to mongodb
+mongoose.connect('mongodb://localhost/phonebook', function(err){
+    if(err){
+        console.log('connection error', err);
+    }else{
+        console.log('connection successful');
+    }
+});
 
 var api = require('./routes/api');
-var authenticate = require('./routes/authenticate')(passport);
+var authenticate = require('./routes/authenticate');
 
-var app = express();
+var config = require('./config');
+//app.set('secret', config.secret); // secret variable
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,6 +47,8 @@ app.use(passport.session());
 var initPassport = require('./passport-init');
 initPassport(passport);
 
+
+//Routes
 app.use('/api', api);
 app.use('/auth', authenticate);
 
